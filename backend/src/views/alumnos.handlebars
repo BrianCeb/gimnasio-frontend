@@ -1,9 +1,11 @@
-<h1>Listado de Alumnos</h1>
-<ul id="lista-alumnos">
-    {{#each alumnos}}
-    <li>{{this.nombre}} - Pago hasta: {{this.fechaPago}}</li>
-    {{/each}}
-</ul>
+<h1>Alumnos en Tiempo Real</h1>
+<form id="form-alumno">
+    <input type="text" id="nombre" placeholder="Nombre del alumno" required />
+    <input type="date" id="fechaPago" placeholder="Fecha de pago" required />
+    <button type="submit">Agregar</button>
+</form>
+
+<ul id="lista-alumnos"></ul>
 
 <script src="/socket.io/socket.io.js"></script>
 <script src="/client.js"></script>
