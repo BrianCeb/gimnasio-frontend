@@ -43,7 +43,7 @@ const AlumnosPage = () => {
         <div className="flex">
             <SidebarAdmin />
             <main className="flex-1 p-6">
-                <h1 className="text-2xl font-bold mb-4">Gestión de Alumnos</h1>
+                <h1 className="text-2xl font-bold mb-4">Alumnos</h1>
                 <AvisoPago alumnos={alumnos} />
                 <AlumnoForm onSubmit={handleAgregarAlumno} editingAlumno={editingAlumno} />
                 <AlumnosList alumnos={alumnos} onEdit={handleEditarAlumno} onDelete={handleEliminarAlumno} />
