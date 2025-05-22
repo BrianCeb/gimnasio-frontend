@@ -56,18 +56,21 @@ app.get('/realtimealumnos', (req, res) => {
 // WebSocket
 io.on('connection', socket => {
     console.log('Cliente conectado');
+    const alumnos = leerAlumnos();
     socket.emit('alumnos', alumnos);
 
     socket.on('nuevoAlumno', alumno => {
-        alumnos.push(alumno);
-        guardarAlumnos(alumnos);
-        io.emit('alumnos', alumnos);
+        const alumnosActualizados = leerAlumnos();
+        alumnosActualizados.push(alumno);
+        guardarAlumnos(alumnosActualizados);
+        io.emit('alumnos', alumnosActualizados);
     });
 
     socket.on('eliminarAlumno', nombre => {
-        alumnos = alumnos.filter(a => a.nombre !== nombre);
-        guardarAlumnos(alumnos);
-        io.emit('alumnos', alumnos);
+        let alumnosActualizados = leerAlumnos();
+        alumnosActualizados = alumnosActualizados.filter(a => a.nombre !== nombre);
+        guardarAlumnos(alumnosActualizados);
+        io.emit('alumnos', alumnosActualizados);
     });
 });
 
