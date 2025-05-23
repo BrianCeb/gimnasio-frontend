@@ -1,81 +1,54 @@
-// === backend/server.js ===
 import express from 'express';
 import { createServer } from 'http';
 import { Server } from 'socket.io';
 import { engine } from 'express-handlebars';
 import path from 'path';
 import { fileURLToPath } from 'url';
-import alumnosRouter from './routes/alumnos.routes.js';
 import { leerAlumnos, guardarAlumnos } from './src/data/alumnos.manager.js';
+
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
 
 const app = express();
 const httpServer = createServer(app);
 const io = new Server(httpServer);
 
-const __filename = fileURLToPath(import.meta.url);
-const __dirname = path.dirname(__filename);
-
-// Handlebars setup
+// Configuración Handlebars
 app.engine('handlebars', engine());
 app.set('view engine', 'handlebars');
-app.set('views', path.join(__dirname, 'views'));
+app.set('views', path.join(__dirname, 'src/views'));
 
 // Middleware
-app.use(express.static(path.join(__dirname, '../public')));
+app.use(express.static(path.join(__dirname, 'public')));
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
-// Estado persistente de alumnos
-io.on('connection', socket => {
-    console.log('Cliente conectado');
-    const alumnos = leerAlumnos(); // 🔁 leer archivo actualizado
-    socket.emit('alumnos', alumnos);
-
-    socket.on('nuevoAlumno', alumno => {
-        const alumnosActualizados = leerAlumnos();
-        alumnosActualizados.push(alumno);
-        guardarAlumnos(alumnosActualizados);
-        io.emit('alumnos', alumnosActualizados);
-    });
-
-    socket.on('eliminarAlumno', nombre => {
-        let alumnosActualizados = leerAlumnos();
-        alumnosActualizados = alumnosActualizados.filter(a => a.nombre !== nombre);
-        guardarAlumnos(alumnosActualizados);
-        io.emit('alumnos', alumnosActualizados);
-    });
-});
-
-// Rutas
-app.use('/', alumnosRouter);
-
+// Ruta Handlebars principal
 app.get('/realtimealumnos', (req, res) => {
-    res.render('realTimeAlumnos');
+    res.render('alumnos');
 });
 
 // WebSocket
 io.on('connection', socket => {
-    console.log('Cliente conectado');
+    console.log(' Cliente WebSocket conectado');
+
     const alumnos = leerAlumnos();
     socket.emit('alumnos', alumnos);
 
     socket.on('nuevoAlumno', alumno => {
-        const alumnosActualizados = leerAlumnos();
-        alumnosActualizados.push(alumno);
-        guardarAlumnos(alumnosActualizados);
-        io.emit('alumnos', alumnosActualizados);
+        const lista = leerAlumnos();
+        lista.push(alumno);
+        guardarAlumnos(lista);
+        io.emit('alumnos', lista);
     });
 
     socket.on('eliminarAlumno', nombre => {
-        let alumnosActualizados = leerAlumnos();
-        alumnosActualizados = alumnosActualizados.filter(a => a.nombre !== nombre);
-        guardarAlumnos(alumnosActualizados);
-        io.emit('alumnos', alumnosActualizados);
+        const lista = leerAlumnos().filter(a => a.nombre !== nombre);
+        guardarAlumnos(lista);
+        io.emit('alumnos', lista);
     });
 });
 
-app.set('socketio', io);
-
 httpServer.listen(3000, () => {
-    console.log('Servidor escuchando en http://localhost:3000');
+    console.log(' Servidor escuchando en http://localhost:3000');
 });

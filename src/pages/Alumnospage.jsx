@@ -1,23 +1,29 @@
 import React, { useState, useEffect } from 'react';
+import { io } from 'socket.io-client';
 import SidebarAdmin from '../components/SlidebarAdmin';
 import AlumnoForm from '../components/AlumnosForm';
 import AlumnosList from '../components/AlumnoList';
 import AvisoPago from '../components/AvisoPago';
+
+const socket = io('http://localhost:3000');
 
 const AlumnosPage = () => {
     const [alumnos, setAlumnos] = useState([]);
     const [editingAlumno, setEditingAlumno] = useState(null);
 
     useEffect(() => {
-        const stored = localStorage.getItem('alumnos');
-        if (stored) {
-            setAlumnos(JSON.parse(stored));
-        }
-    }, []);
+        // Cargar alumnos del backend
+        fetch('http://localhost:3000/api/alumnos')
+            .then(res => res.json())
+            .then(data => setAlumnos(data));
 
-    useEffect(() => {
-        localStorage.setItem('alumnos', JSON.stringify(alumnos));
-    }, [alumnos]);
+        // WebSocket: recibir actualizaciones
+        socket.on('alumnos', setAlumnos);
+
+        return () => {
+            socket.off('alumnos');
+        };
+    }, []);
 
     const handleAgregarAlumno = (alumno) => {
         if (editingAlumno) {
@@ -25,7 +31,7 @@ const AlumnosPage = () => {
             setAlumnos(updated);
             setEditingAlumno(null);
         } else {
-            setAlumnos([...alumnos, alumno]);
+            socket.emit('nuevoAlumno', alumno); // 🔁 Enviar al backend
         }
     };
 
@@ -35,7 +41,7 @@ const AlumnosPage = () => {
 
     const handleEliminarAlumno = (alumno) => {
         if (confirm(`¿Seguro que deseas eliminar a ${alumno.nombre}?`)) {
-            setAlumnos(alumnos.filter(a => a !== alumno));
+            socket.emit('eliminarAlumno', alumno.nombre); // 🔁 Enviar al backend
         }
     };
 

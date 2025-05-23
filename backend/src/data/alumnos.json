@@ -1,6 +1,14 @@
 [
-    {
-        "nombre": "Juan Pérez",
-        "fechaPago": "2025-05-25"
-    }
+  {
+    "nombre": "Juan Pérez",
+    "fechaPago": "2025-05-25"
+  },
+  {
+    "nombre": "Brian",
+    "fechaPago": "2025-04-30"
+  },
+  {
+    "nombre": "Brian",
+    "fechaPago": "2025-05-08"
+  }
 ]

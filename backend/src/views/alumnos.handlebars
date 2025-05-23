@@ -1,11 +1,13 @@
-<h1>Alumnos en Tiempo Real</h1>
-<form id="form-alumno">
-    <input type="text" id="nombre" placeholder="Nombre del alumno" required />
-    <input type="date" id="fechaPago" placeholder="Fecha de pago" required />
-    <button type="submit">Agregar</button>
+<h1 class="text-2xl font-bold mb-4">Alumnos en Tiempo Real</h1>
+
+<form id="form-alumno" class="flex gap-2 mb-4">
+    <input type="text" id="nombre" placeholder="Nombre del alumno" required class="border p-2 rounded w-1/3" />
+    <input type="date" id="fechaPago" required class="border p-2 rounded w-1/3" />
+    <button type="submit" class="bg-green-600 text-white px-4 py-2 rounded">Agregar</button>
 </form>
 
-<ul id="lista-alumnos"></ul>
+<ul id="lista-alumnos" class="space-y-2">
+</ul>
 
 <script src="/socket.io/socket.io.js"></script>
 <script src="/client.js"></script>
