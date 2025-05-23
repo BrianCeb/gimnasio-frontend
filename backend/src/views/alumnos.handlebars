@@ -1,5 +1,4 @@
 <h1 class="text-2xl font-bold mb-4">Alumnos en Tiempo Real</h1>
-
 <form id="form-alumno" class="flex gap-2 mb-4">
     <input type="text" id="nombre" placeholder="Nombre del alumno" required class="border p-2 rounded w-1/3" />
     <input type="date" id="fechaPago" required class="border p-2 rounded w-1/3" />
@@ -7,7 +6,39 @@
 </form>
 
 <ul id="lista-alumnos" class="space-y-2">
+    <!-- Renderizado dinámico por JS -->
 </ul>
 
 <script src="/socket.io/socket.io.js"></script>
-<script src="/client.js"></script>
+<script>
+const socket = io();
+
+const form = document.getElementById('form-alumno');
+const lista = document.getElementById('lista-alumnos');
+
+form.addEventListener('submit', e => {
+    e.preventDefault();
+    const nombre = document.getElementById('nombre').value;
+    const fechaPago = document.getElementById('fechaPago').value;
+    socket.emit('nuevoAlumno', { nombre, fechaPago });
+    form.reset();
+});
+
+socket.on('alumnos', alumnos => {
+    lista.innerHTML = '';
+    alumnos.forEach(alumno => {
+        const li = document.createElement('li');
+        li.className = 'bg-white p-2 rounded shadow flex justify-between items-center';
+        li.innerHTML = `
+            <div>
+                <strong>${alumno.nombre}</strong><br>
+                Pago: ${alumno.fechaPago} - Vence: ${alumno.fechaVencimiento}
+            </div>
+            <button class="bg-red-500 text-white px-2 py-1 rounded" onclick="socket.emit('eliminarAlumno', '${alumno.nombre}')">
+                Eliminar
+            </button>
+        `;
+        lista.appendChild(li);
+    });
+});
+</script>

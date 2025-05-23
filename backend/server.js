@@ -1,3 +1,4 @@
+// === backend/server.js ===
 import express from 'express';
 import { createServer } from 'http';
 import { Server } from 'socket.io';
@@ -37,7 +38,18 @@ io.on('connection', socket => {
 
     socket.on('nuevoAlumno', alumno => {
         const lista = leerAlumnos();
-        lista.push(alumno);
+
+        // Calcular fecha de vencimiento: 30 días después de fechaPago
+        const fechaPago = new Date(alumno.fechaPago);
+        const fechaVencimiento = new Date(fechaPago);
+        fechaVencimiento.setDate(fechaVencimiento.getDate() + 30);
+
+        const alumnoConVencimiento = {
+            ...alumno,
+            fechaVencimiento: fechaVencimiento.toISOString().split('T')[0] // formato YYYY-MM-DD
+        };
+
+        lista.push(alumnoConVencimiento);
         guardarAlumnos(lista);
         io.emit('alumnos', lista);
     });
@@ -50,5 +62,5 @@ io.on('connection', socket => {
 });
 
 httpServer.listen(3000, () => {
-    console.log(' Servidor escuchando en http://localhost:3000');
+    console.log(' Servidor escuchando en http://localhost:3000/realtimealumnos');
 });
