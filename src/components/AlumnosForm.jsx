@@ -1,7 +1,13 @@
 import React, { useState, useEffect } from 'react';
 
 const AlumnoForm = ({ onSubmit, editingAlumno }) => {
-    const [alumno, setAlumno] = useState({ nombre: '', fechaPago: '' });
+    const [alumno, setAlumno] = useState({
+        nombre: '',
+        apellido: '',
+        dni: '',
+        email: '',
+        fechaPago: ''
+    });
 
     useEffect(() => {
         if (editingAlumno) {
@@ -16,12 +22,19 @@ const AlumnoForm = ({ onSubmit, editingAlumno }) => {
     const handleSubmit = (e) => {
         e.preventDefault();
         onSubmit(alumno);
-        setAlumno({ nombre: '', fechaPago: '' });
+        setAlumno({
+            nombre: '',
+            apellido: '',
+            dni: '',
+            email: '',
+            fechaPago: ''
+        });
     };
 
     return (
         <form onSubmit={handleSubmit} className="bg-white p-4 rounded shadow-md">
             <h2 className="text-lg font-semibold mb-4">{editingAlumno ? 'Editar Alumno' : 'Alta de Alumno'}</h2>
+
             <div className="mb-2">
                 <label className="block mb-1">Nombre:</label>
                 <input
@@ -33,6 +46,43 @@ const AlumnoForm = ({ onSubmit, editingAlumno }) => {
                     required
                 />
             </div>
+
+            <div className="mb-2">
+                <label className="block mb-1">Apellido:</label>
+                <input
+                    type="text"
+                    name="apellido"
+                    value={alumno.apellido}
+                    onChange={handleChange}
+                    className="w-full border p-2 rounded"
+                    required
+                />
+            </div>
+
+            <div className="mb-2">
+                <label className="block mb-1">DNI:</label>
+                <input
+                    type="text"
+                    name="dni"
+                    value={alumno.dni}
+                    onChange={handleChange}
+                    className="w-full border p-2 rounded"
+                    required
+                />
+            </div>
+
+            <div className="mb-2">
+                <label className="block mb-1">Email:</label>
+                <input
+                    type="email"
+                    name="email"
+                    value={alumno.email}
+                    onChange={handleChange}
+                    className="w-full border p-2 rounded"
+                    required
+                />
+            </div>
+
             <div className="mb-2">
                 <label className="block mb-1">Fecha de Pago:</label>
                 <input
@@ -44,6 +94,7 @@ const AlumnoForm = ({ onSubmit, editingAlumno }) => {
                     required
                 />
             </div>
+
             <button type="submit" className="bg-green-600 text-white px-4 py-2 rounded mt-2">
                 {editingAlumno ? 'Actualizar' : 'Guardar'}
             </button>
