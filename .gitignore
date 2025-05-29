@@ -7,22 +7,33 @@ yarn-error.log*
 pnpm-debug.log*
 lerna-debug.log*
 
-node_modules
-dist
-dist-ssr
+# Dependencias
+/node_modules
+/backend/node_modules
+
+# Build outputs
+/dist
+/vite
+/backend/dist
+
+# Archivos de entorno
+.env
+/backend/.env
 *.local
 
-# Editor directories and files
-.vscode/*
+# Archivos del sistema
+.DS_Store
+
+# Directorios y archivos de editor
+.vscode/
 !.vscode/extensions.json
 .idea
-.DS_Store
 *.suo
 *.ntvs*
 *.njsproj
 *.sln
 *.sw?
 
-/node_modules
-/dist
-.env
+# Archivos temporales
+*.tmp
+*.swp
