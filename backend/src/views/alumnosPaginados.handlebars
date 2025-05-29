@@ -1,0 +1,37 @@
+<h1 class="text-2xl font-bold mb-4">Listado de Alumnos</h1>
+
+<form method="GET" action="/alumnos" class="mb-4 flex gap-2">
+    <input type="text" name="nombre" placeholder="Buscar por nombre..." class="p-2 border rounded" />
+    <select name="sort" class="p-2 border rounded">
+        <option value="">Ordenar por nombre</option>
+        <option value="asc">A-Z</option>
+        <option value="desc">Z-A</option>
+    </select>
+    <button type="submit" class="bg-green-600 text-white px-4 py-2 rounded">Buscar</button>
+</form>
+
+<ul class="space-y-2 mb-4">
+    {{#each alumnos}}
+    <li class="bg-white p-2 rounded shadow flex justify-between items-center">
+        <div>
+            <strong>{{this.nombre}} {{this.apellido}}</strong><br />
+            DNI: {{this.dni}}<br />
+            Email: {{this.email}}<br />
+            Pago: {{this.fechaPago}}<br />
+            Vencimiento: {{this.fechaVencimiento}}
+        </div>
+    </li>
+    {{/each}}
+</ul>
+
+<div class="flex gap-2 items-center">
+    {{#if hasPrevPage}}
+    <a href="/alumnos?page={{prevPage}}" class="bg-gray-300 px-3 py-1 rounded">Anterior</a>
+    {{/if}}
+
+    <span>Página {{page}} de {{totalPages}}</span>
+
+    {{#if hasNextPage}}
+    <a href="/alumnos?page={{nextPage}}" class="bg-gray-300 px-3 py-1 rounded">Siguiente</a>
+    {{/if}}
+</div>

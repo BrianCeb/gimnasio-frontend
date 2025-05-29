@@ -12,12 +12,10 @@ const AlumnosPage = () => {
     const [editingAlumno, setEditingAlumno] = useState(null);
 
     useEffect(() => {
-        // Cargar alumnos del backend
         fetch('http://localhost:3000/api/alumnos')
             .then(res => res.json())
             .then(data => setAlumnos(data));
 
-        // WebSocket: recibir actualizaciones
         socket.on('alumnos', setAlumnos);
 
         return () => {
@@ -31,7 +29,7 @@ const AlumnosPage = () => {
             setAlumnos(updated);
             setEditingAlumno(null);
         } else {
-            socket.emit('nuevoAlumno', alumno); // 🔁 Enviar al backend
+            socket.emit('nuevoAlumno', alumno); 
         }
     };
 
@@ -41,7 +39,7 @@ const AlumnosPage = () => {
 
     const handleEliminarAlumno = (alumno) => {
         if (confirm(`¿Seguro que deseas eliminar a ${alumno.nombre}?`)) {
-            socket.emit('eliminarAlumno', alumno.nombre); // 🔁 Enviar al backend
+            socket.emit('eliminarAlumno', alumno.nombre); 
         }
     };
 

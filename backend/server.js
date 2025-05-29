@@ -1,11 +1,16 @@
-// === backend/server.js ===
+// backend/server.js
 import express from 'express';
 import { createServer } from 'http';
 import { Server } from 'socket.io';
+import mongoose from 'mongoose';
 import { engine } from 'express-handlebars';
 import path from 'path';
 import { fileURLToPath } from 'url';
-import { leerAlumnos, guardarAlumnos } from './src/data/alumnos.manager.js';
+import dotenv from 'dotenv';
+import alumnosRouter from './src/routes/alumnos.router.js';
+import Alumno from './src/models/Alumno.js';
+
+dotenv.config();
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -14,53 +19,101 @@ const app = express();
 const httpServer = createServer(app);
 const io = new Server(httpServer);
 
-// Configuración Handlebars
+// Conexión a MongoDB
+mongoose.connect(process.env.MONGO_URL)
+    .then(() => console.log('✅ Conectado a MongoDB'))
+    .catch(err => console.error('❌ Error al conectar a MongoDB:', err));
+
+// Middleware
+app.use(express.json());
+app.use(express.urlencoded({ extended: true }));
+app.use(express.static(path.join(__dirname, 'public')));
+
+// Handlebars
 app.engine('handlebars', engine());
 app.set('view engine', 'handlebars');
 app.set('views', path.join(__dirname, 'src/views'));
 
-// Middleware
-app.use(express.static(path.join(__dirname, 'public')));
-app.use(express.json());
-app.use(express.urlencoded({ extended: true }));
+// Rutas API
+app.use('/api/alumnos', alumnosRouter);
 
-// Ruta Handlebars principal
-app.get('/realtimealumnos', (req, res) => {
+// Vista paginada con filtros
+app.get('/alumnos', async (req, res) => {
+    try {
+        const { limit = 5, page = 1, sort, nombre } = req.query;
+
+        const query = nombre ? { nombre: { $regex: nombre, $options: 'i' } } : {};
+        const options = {
+            page: parseInt(page),
+            limit: parseInt(limit),
+            sort: sort ? { nombre: sort === 'asc' ? 1 : -1 } : {}
+        };
+
+        const result = await Alumno.paginate(query, options);
+
+        res.render('alumnosPaginados', {
+            alumnos: result.docs,
+            hasPrevPage: result.hasPrevPage,
+            hasNextPage: result.hasNextPage,
+            prevPage: result.prevPage,
+            nextPage: result.nextPage,
+            page: result.page,
+            totalPages: result.totalPages
+        });
+    } catch (error) {
+        res.status(500).send('Error al cargar alumnos');
+    }
+});
+
+// Vista realtime
+app.get('/realtimealumnos', async (req, res) => {
     res.render('alumnos');
 });
 
-// WebSocket
-io.on('connection', socket => {
-    console.log(' Cliente WebSocket conectado');
+// WebSocket con MongoDB
+io.on('connection', async socket => {
+    console.log('📡 Cliente conectado');
 
-    const alumnos = leerAlumnos();
+    const alumnos = await Alumno.find();
     socket.emit('alumnos', alumnos);
 
-    socket.on('nuevoAlumno', alumno => {
-        const lista = leerAlumnos();
+    socket.on('nuevoAlumno', async alumnoData => {
+        try {
+            const existente = await Alumno.findOne({ dni: alumnoData.dni });
+            if (existente) {
+                console.log('❌ DNI duplicado');
+                return;
+            }
 
-        // Calcular fecha de vencimiento: 30 días después de fechaPago
-        const fechaPago = new Date(alumno.fechaPago);
-        const fechaVencimiento = new Date(fechaPago);
-        fechaVencimiento.setDate(fechaVencimiento.getDate() + 30);
+            const fechaPago = new Date(alumnoData.fechaPago);
+            const fechaVencimiento = new Date(fechaPago);
+            fechaVencimiento.setDate(fechaPago.getDate() + 30);
 
-        const alumnoConVencimiento = {
-            ...alumno,
-            fechaVencimiento: fechaVencimiento.toISOString().split('T')[0] // formato YYYY-MM-DD
-        };
+            const nuevoAlumno = new Alumno({
+                nombre: alumnoData.nombre,
+                apellido: alumnoData.apellido,
+                dni: alumnoData.dni,
+                email: alumnoData.email,
+                fechaPago,
+                fechaVencimiento
+            });
 
-        lista.push(alumnoConVencimiento);
-        guardarAlumnos(lista);
-        io.emit('alumnos', lista);
+            await nuevoAlumno.save();
+            const actualizados = await Alumno.find();
+            io.emit('alumnos', actualizados);
+        } catch (err) {
+            console.error('❌ Error al guardar alumno desde socket:', err);
+        }
     });
 
-    socket.on('eliminarAlumno', nombre => {
-        const lista = leerAlumnos().filter(a => a.nombre !== nombre);
-        guardarAlumnos(lista);
-        io.emit('alumnos', lista);
+    socket.on('eliminarAlumno', async id => {
+        await Alumno.findByIdAndDelete(id);
+        const actualizados = await Alumno.find();
+        io.emit('alumnos', actualizados);
     });
 });
 
-httpServer.listen(3000, () => {
-    console.log(' Servidor escuchando en http://localhost:3000/realtimealumnos');
+const PORT = process.env.PORT || 3000;
+httpServer.listen(PORT, () => {
+    console.log(`🚀 Servidor en http://localhost:${PORT}`);
 });
