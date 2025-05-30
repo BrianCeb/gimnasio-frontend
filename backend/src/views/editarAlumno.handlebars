@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8" />
+    <title>Editar Alumno</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="bg-gray-100 text-gray-900 p-6">
+    <div class="max-w-xl mx-auto bg-white p-6 shadow-md rounded">
+        <h1 class="text-2xl font-bold mb-4">Editar Alumno</h1>
+
+        <form action="/api/alumnos/editar/{{alumno._id}}" method="POST" class="space-y-4">
+            <div>
+                <label>Nombre:</label>
+                <input type="text" name="nombre" value="{{alumno.nombre}}" required class="w-full border p-2 rounded">
+            </div>
+            <div>
+                <label>Apellido:</label>
+                <input type="text" name="apellido" value="{{alumno.apellido}}" required class="w-full border p-2 rounded">
+            </div>
+            <div>
+                <label>DNI:</label>
+                <input type="text" name="dni" value="{{alumno.dni}}" required class="w-full border p-2 rounded">
+            </div>
+            <div>
+                <label>Email:</label>
+                <input type="email" name="email" value="{{alumno.email}}" required class="w-full border p-2 rounded">
+            </div>
+            <div>
+                <label>Fecha de Pago:</label>
+                <input type="date" name="fechaPago" value="{{alumno.fechaPago}}" required class="w-full border p-2 rounded">
+            </div>
+
+            <div class="flex gap-4">
+                <button type="submit" class="bg-green-600 text-white px-4 py-2 rounded">Guardar Cambios</button>
+                <a href="/alumnos" class="bg-gray-400 text-white px-4 py-2 rounded">Cancelar</a>
+            </div>
+        </form>
+    </div>
+</body>
+</html>

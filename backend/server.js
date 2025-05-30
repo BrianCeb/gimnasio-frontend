@@ -38,12 +38,12 @@ app.engine('handlebars', engine({
 app.set('view engine', 'handlebars');
 app.set('views', path.join(__dirname, 'src/views'));
 
-// Ruta principal - página de inicio
+// Ruta principal
 app.get('/', (req, res) => {
     res.render('home');
 });
 
-// Rutas API
+// API REST
 app.use('/api/alumnos', alumnosRouter);
 
 // Vista paginada con filtros
@@ -71,6 +71,33 @@ app.get('/alumnos', async (req, res) => {
         });
     } catch (error) {
         res.status(500).send('Error al cargar alumnos');
+    }
+});
+
+// Vista individual de alumno
+app.get('/alumnos/:id', async (req, res) => {
+    try {
+        const alumno = await Alumno.findById(req.params.id);
+        if (!alumno) return res.status(404).send('Alumno no encontrado');
+
+        res.render('alumnoDetalle', { alumno });
+    } catch (err) {
+        res.status(500).send('Error al obtener el alumno');
+    }
+});
+
+// Formulario de edición
+app.get('/alumnos/editar/:id', async (req, res) => {
+    try {
+        const alumno = await Alumno.findById(req.params.id);
+        if (!alumno) return res.status(404).send('Alumno no encontrado');
+
+        // Convertir fecha para input type="date"
+        const fechaPagoISO = alumno.fechaPago.toISOString().split('T')[0];
+
+        res.render('editarAlumno', { alumno: { ...alumno.toObject(), fechaPago: fechaPagoISO } });
+    } catch (err) {
+        res.status(500).send('Error al cargar el formulario de edición');
     }
 });
 
@@ -122,6 +149,7 @@ io.on('connection', async socket => {
     });
 });
 
+// Servidor
 const PORT = process.env.PORT || 3000;
 httpServer.listen(PORT, () => {
     console.log(`🚀 Servidor en http://localhost:${PORT}`);
