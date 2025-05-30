@@ -4,6 +4,8 @@ import { createServer } from 'http';
 import { Server } from 'socket.io';
 import mongoose from 'mongoose';
 import { engine } from 'express-handlebars';
+import Handlebars from 'handlebars';
+import { allowInsecurePrototypeAccess } from '@handlebars/allow-prototype-access';
 import path from 'path';
 import { fileURLToPath } from 'url';
 import dotenv from 'dotenv';
@@ -29,10 +31,17 @@ app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 app.use(express.static(path.join(__dirname, 'public')));
 
-// Handlebars
-app.engine('handlebars', engine());
+// Handlebars con acceso a prototipos habilitado
+app.engine('handlebars', engine({
+    handlebars: allowInsecurePrototypeAccess(Handlebars)
+}));
 app.set('view engine', 'handlebars');
 app.set('views', path.join(__dirname, 'src/views'));
+
+// Ruta principal - página de inicio
+app.get('/', (req, res) => {
+    res.render('home');
+});
 
 // Rutas API
 app.use('/api/alumnos', alumnosRouter);

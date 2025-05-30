@@ -65,5 +65,29 @@ router.delete('/:id', async (req, res) => {
         res.status(500).json({ error: 'Error al eliminar alumno' });
     }
 });
+router.post('/editar/:id', async (req, res) => {
+    const { id } = req.params;
+    const { nombre, apellido, dni, email, fechaPago } = req.body;
+
+    try {
+        const fechaVencimiento = new Date(fechaPago);
+        fechaVencimiento.setDate(fechaVencimiento.getDate() + 30);
+
+        await Alumno.findByIdAndUpdate(id, {
+            nombre,
+            apellido,
+            dni,
+            email,
+            fechaPago,
+            fechaVencimiento,
+        });
+
+        res.redirect('/alumnos');
+    } catch (error) {
+        console.error('Error al editar alumno:', error);
+        res.status(500).send('Error al editar el alumno');
+    }
+});
+
 
 export default router;
