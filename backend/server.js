@@ -9,6 +9,7 @@ import { allowInsecurePrototypeAccess } from '@handlebars/allow-prototype-access
 import path from 'path';
 import { fileURLToPath } from 'url';
 import dotenv from 'dotenv';
+import cors from 'cors'; // ✅ Nuevo
 import alumnosRouter from './src/routes/alumnos.router.js';
 import Alumno from './src/models/Alumno.js';
 
@@ -19,7 +20,21 @@ const __dirname = path.dirname(__filename);
 
 const app = express();
 const httpServer = createServer(app);
-const io = new Server(httpServer);
+
+// ✅ Permitir CORS desde React (puerto Vite)
+app.use(cors({
+    origin: 'http://localhost:5173',
+    methods: ['GET', 'POST', 'PUT', 'DELETE'],
+    credentials: true
+}));
+
+// ✅ Configurar CORS en socket.io
+const io = new Server(httpServer, {
+    cors: {
+        origin: 'http://localhost:5173',
+        methods: ['GET', 'POST']
+    }
+});
 
 // Conexión a MongoDB
 mongoose.connect(process.env.MONGO_URL)
@@ -38,26 +53,24 @@ app.engine('handlebars', engine({
 app.set('view engine', 'handlebars');
 app.set('views', path.join(__dirname, 'src/views'));
 
-// Ruta principal
+// Ruta principal - página de inicio
 app.get('/', (req, res) => {
     res.render('home');
 });
 
-// API REST
+// Rutas API
 app.use('/api/alumnos', alumnosRouter);
 
-// Vista paginada con filtros
+// Vista paginada
 app.get('/alumnos', async (req, res) => {
     try {
         const { limit = 5, page = 1, sort, nombre } = req.query;
-
         const query = nombre ? { nombre: { $regex: nombre, $options: 'i' } } : {};
         const options = {
             page: parseInt(page),
             limit: parseInt(limit),
             sort: sort ? { nombre: sort === 'asc' ? 1 : -1 } : {}
         };
-
         const result = await Alumno.paginate(query, options);
 
         res.render('alumnosPaginados', {
@@ -74,39 +87,12 @@ app.get('/alumnos', async (req, res) => {
     }
 });
 
-// Vista individual de alumno
-app.get('/alumnos/:id', async (req, res) => {
-    try {
-        const alumno = await Alumno.findById(req.params.id);
-        if (!alumno) return res.status(404).send('Alumno no encontrado');
-
-        res.render('alumnoDetalle', { alumno });
-    } catch (err) {
-        res.status(500).send('Error al obtener el alumno');
-    }
-});
-
-// Formulario de edición
-app.get('/alumnos/editar/:id', async (req, res) => {
-    try {
-        const alumno = await Alumno.findById(req.params.id);
-        if (!alumno) return res.status(404).send('Alumno no encontrado');
-
-        // Convertir fecha para input type="date"
-        const fechaPagoISO = alumno.fechaPago.toISOString().split('T')[0];
-
-        res.render('editarAlumno', { alumno: { ...alumno.toObject(), fechaPago: fechaPagoISO } });
-    } catch (err) {
-        res.status(500).send('Error al cargar el formulario de edición');
-    }
-});
-
 // Vista realtime
 app.get('/realtimealumnos', async (req, res) => {
     res.render('alumnos');
 });
 
-// WebSocket con MongoDB
+// WebSocket
 io.on('connection', async socket => {
     console.log('📡 Cliente conectado');
 
@@ -149,7 +135,6 @@ io.on('connection', async socket => {
     });
 });
 
-// Servidor
 const PORT = process.env.PORT || 3000;
 httpServer.listen(PORT, () => {
     console.log(`🚀 Servidor en http://localhost:${PORT}`);

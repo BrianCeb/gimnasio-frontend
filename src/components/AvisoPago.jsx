@@ -17,9 +17,11 @@ const AvisoPago = ({ alumnos }) => {
             <ul className="list-disc pl-5">
                 {alumnosConAviso.map((alumno, index) => {
                     const diasRestantes = Math.ceil((new Date(alumno.fechaVencimiento) - hoy) / (1000 * 60 * 60 * 24));
+                    const fechaVenc = new Date(alumno.fechaVencimiento).toLocaleDateString();
+
                     return (
                         <li key={index}>
-                            <span className="font-medium">{alumno.nombre}</span> - vence en {diasRestantes} día(s)
+                            <span className="font-medium">{alumno.nombre} {alumno.apellido}</span> - vence el {fechaVenc} ({diasRestantes} día/s)
                         </li>
                     );
                 })}

@@ -12,6 +12,14 @@ const AlumnoForm = ({ onSubmit, editingAlumno }) => {
     useEffect(() => {
         if (editingAlumno) {
             setAlumno(editingAlumno);
+        } else {
+            setAlumno({
+                nombre: '',
+                apellido: '',
+                dni: '',
+                email: '',
+                fechaPago: ''
+            });
         }
     }, [editingAlumno]);
 
@@ -21,19 +29,23 @@ const AlumnoForm = ({ onSubmit, editingAlumno }) => {
 
     const handleSubmit = (e) => {
         e.preventDefault();
-        onSubmit(alumno);
-        setAlumno({
-            nombre: '',
-            apellido: '',
-            dni: '',
-            email: '',
-            fechaPago: ''
-        });
+        onSubmit(alumno); // Se encarga el padre de emitir al socket o guardar por API
+        if (!editingAlumno) {
+            setAlumno({
+                nombre: '',
+                apellido: '',
+                dni: '',
+                email: '',
+                fechaPago: ''
+            });
+        }
     };
 
     return (
-        <form onSubmit={handleSubmit} className="bg-white p-4 rounded shadow-md">
-            <h2 className="text-lg font-semibold mb-4">{editingAlumno ? 'Editar Alumno' : 'Alta de Alumno'}</h2>
+        <form onSubmit={handleSubmit} className="bg-white p-4 rounded shadow-md mt-4">
+            <h2 className="text-lg font-semibold mb-4">
+                {editingAlumno ? 'Editar Alumno' : 'Alta de Alumno'}
+            </h2>
 
             <div className="mb-2">
                 <label className="block mb-1">Nombre:</label>
@@ -68,6 +80,7 @@ const AlumnoForm = ({ onSubmit, editingAlumno }) => {
                     onChange={handleChange}
                     className="w-full border p-2 rounded"
                     required
+                    disabled={editingAlumno} // ✅ No modificar DNI si está en edición
                 />
             </div>
 
@@ -95,7 +108,10 @@ const AlumnoForm = ({ onSubmit, editingAlumno }) => {
                 />
             </div>
 
-            <button type="submit" className="bg-green-600 text-white px-4 py-2 rounded mt-2">
+            <button
+                type="submit"
+                className="bg-green-600 text-white px-4 py-2 rounded mt-2"
+            >
                 {editingAlumno ? 'Actualizar' : 'Guardar'}
             </button>
         </form>
