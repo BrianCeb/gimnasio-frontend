@@ -37,3 +37,5 @@ lerna-debug.log*
 # Archivos temporales
 *.tmp
 *.swp
+
+/backend/public/dist/
