@@ -16,7 +16,11 @@ const AlumnosList = ({ alumnos, onEdit, onDelete }) => {
                     const fechaVenc = new Date(alumno.fechaVencimiento).toLocaleDateString();
 
                     return (
-                        <li key={index} className="bg-gray-100 p-3 rounded shadow flex justify-between items-center">
+                        <li
+                            key={index}
+                            className="bg-gray-100 p-3 rounded shadow flex justify-between items-center transition-all duration-300 animate-fade-in"
+                        >
+
                             <div className="flex items-center space-x-3">
                                 <img
                                     src={alumno.fotoUrl || 'https://via.placeholder.com/48'}

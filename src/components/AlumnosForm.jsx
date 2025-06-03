@@ -30,19 +30,20 @@ const AlumnoForm = ({ onSubmit, editingAlumno }) => {
     };
 
     const handleSubmit = (e) => {
-        e.preventDefault();
-        onSubmit(alumno);
-        if (!editingAlumno) {
-            setAlumno({
-                nombre: '',
-                apellido: '',
-                dni: '',
-                email: '',
-                fechaPago: '',
-                fotoUrl: ''
-            });
-        }
-    };
+    e.preventDefault();
+    onSubmit(alumno);
+
+    // Limpiar formulario si fue edición o alta
+    setAlumno({
+        nombre: '',
+        apellido: '',
+        dni: '',
+        email: '',
+        fechaPago: '',
+        fotoUrl: ''
+    });
+};
+
 
     return (
         <form onSubmit={handleSubmit} className="bg-white p-4 rounded shadow-md mt-4">

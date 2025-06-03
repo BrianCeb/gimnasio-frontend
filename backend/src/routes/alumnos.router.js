@@ -1,4 +1,3 @@
-// src/routes/alumnos.router.js
 import express from 'express';
 import Alumno from '../models/Alumno.js';
 
@@ -7,7 +6,7 @@ const router = express.Router();
 // Crear nuevo alumno
 router.post('/', async (req, res) => {
     try {
-        const { nombre, apellido, dni, email, fechaPago } = req.body;
+        const { nombre, apellido, dni, email, fechaPago, fotoUrl } = req.body;
 
         const fechaPagoDate = new Date(fechaPago);
         const fechaVencimiento = new Date(fechaPagoDate);
@@ -19,7 +18,8 @@ router.post('/', async (req, res) => {
             dni,
             email,
             fechaPago: fechaPagoDate,
-            fechaVencimiento
+            fechaVencimiento,
+            fotoUrl
         });
 
         await nuevoAlumno.save();
@@ -65,9 +65,11 @@ router.delete('/:id', async (req, res) => {
         res.status(500).json({ error: 'Error al eliminar alumno' });
     }
 });
+
+// Editar alumno desde Handlebars (formulario)
 router.post('/editar/:id', async (req, res) => {
     const { id } = req.params;
-    const { nombre, apellido, dni, email, fechaPago } = req.body;
+    const { nombre, apellido, dni, email, fechaPago, fotoUrl } = req.body;
 
     try {
         const fechaVencimiento = new Date(fechaPago);
@@ -80,6 +82,7 @@ router.post('/editar/:id', async (req, res) => {
             email,
             fechaPago,
             fechaVencimiento,
+            fotoUrl
         });
 
         res.redirect('/alumnos');
@@ -89,5 +92,35 @@ router.post('/editar/:id', async (req, res) => {
     }
 });
 
+// Editar alumno desde React (PUT)
+router.put('/:id', async (req, res) => {
+    const { id } = req.params;
+    const { nombre, apellido, dni, email, fechaPago, fotoUrl } = req.body;
+
+    try {
+        const fechaPagoDate = new Date(fechaPago);
+        const fechaVencimiento = new Date(fechaPagoDate);
+        fechaVencimiento.setDate(fechaPagoDate.getDate() + 30);
+
+        const alumnoActualizado = await Alumno.findByIdAndUpdate(
+            id,
+            {
+                nombre,
+                apellido,
+                dni,
+                email,
+                fechaPago: fechaPagoDate,
+                fechaVencimiento,
+                fotoUrl
+            },
+            { new: true }
+        );
+
+        res.status(200).json(alumnoActualizado);
+    } catch (error) {
+        console.error('❌ Error al actualizar alumno:', error);
+        res.status(500).json({ error: 'Error al actualizar alumno' });
+    }
+});
 
 export default router;
