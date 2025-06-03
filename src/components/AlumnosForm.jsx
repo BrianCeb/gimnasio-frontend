@@ -6,7 +6,8 @@ const AlumnoForm = ({ onSubmit, editingAlumno }) => {
         apellido: '',
         dni: '',
         email: '',
-        fechaPago: ''
+        fechaPago: '',
+        fotoUrl: ''
     });
 
     useEffect(() => {
@@ -18,7 +19,8 @@ const AlumnoForm = ({ onSubmit, editingAlumno }) => {
                 apellido: '',
                 dni: '',
                 email: '',
-                fechaPago: ''
+                fechaPago: '',
+                fotoUrl: ''
             });
         }
     }, [editingAlumno]);
@@ -29,14 +31,15 @@ const AlumnoForm = ({ onSubmit, editingAlumno }) => {
 
     const handleSubmit = (e) => {
         e.preventDefault();
-        onSubmit(alumno); // Se encarga el padre de emitir al socket o guardar por API
+        onSubmit(alumno);
         if (!editingAlumno) {
             setAlumno({
                 nombre: '',
                 apellido: '',
                 dni: '',
                 email: '',
-                fechaPago: ''
+                fechaPago: '',
+                fotoUrl: ''
             });
         }
     };
@@ -80,7 +83,7 @@ const AlumnoForm = ({ onSubmit, editingAlumno }) => {
                     onChange={handleChange}
                     className="w-full border p-2 rounded"
                     required
-                    disabled={editingAlumno} // ✅ No modificar DNI si está en edición
+                    disabled={editingAlumno}
                 />
             </div>
 
@@ -105,6 +108,18 @@ const AlumnoForm = ({ onSubmit, editingAlumno }) => {
                     onChange={handleChange}
                     className="w-full border p-2 rounded"
                     required
+                />
+            </div>
+
+            <div className="mb-2">
+                <label className="block mb-1">Foto (URL):</label>
+                <input
+                    type="url"
+                    name="fotoUrl"
+                    value={alumno.fotoUrl}
+                    onChange={handleChange}
+                    className="w-full border p-2 rounded"
+                    placeholder="https://..."
                 />
             </div>
 
