@@ -8,10 +8,10 @@ const IngresosPage = () => {
     const [alumnos, setAlumnos] = useState([]);
 
     useEffect(() => {
-        const stored = localStorage.getItem('ingresos');
-        if (stored) {
-            setIngresos(JSON.parse(stored));
-        }
+        fetch('http://localhost:3000/api/ingresos')
+            .then(res => res.json())
+            .then(data => setIngresos(data))
+            .catch(err => console.error('Error al obtener ingresos:', err));
 
         fetch('http://localhost:3000/api/alumnos')
             .then(res => res.json())
@@ -19,25 +19,32 @@ const IngresosPage = () => {
             .catch(err => console.error('Error al obtener alumnos:', err));
     }, []);
 
-    useEffect(() => {
-        localStorage.setItem('ingresos', JSON.stringify(ingresos));
-    }, [ingresos]);
-
     const handleRegistrarIngreso = (nuevoIngreso) => {
-        setIngresos([...ingresos, nuevoIngreso]);
+        fetch('http://localhost:3000/api/ingresos', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(nuevoIngreso)
+        })
+            .then(res => res.json())
+            .then((data) => {
+                setIngresos(prev => [data, ...prev]);
+                const alumno = alumnos.find(a => a.nombre.toLowerCase() === nuevoIngreso.nombre.toLowerCase());
 
-        const alumno = alumnos.find(a => a.nombre.toLowerCase() === nuevoIngreso.nombre.toLowerCase());
-
-        if (alumno) {
-            const vencido = new Date(alumno.fechaVencimiento) < new Date();
-            if (vencido) {
-                toast.warn(`⚠️ ${alumno.nombre} tiene el pago vencido`);
-            } else {
-                toast.success(`Ingreso registrado para ${alumno.nombre}`);
-            }
-        } else {
-            toast.info('Ingreso registrado (alumno no encontrado en la base)');
-        }
+                if (alumno) {
+                    const vencido = new Date(alumno.fechaVencimiento) < new Date();
+                    if (vencido) {
+                        toast.warn(`⚠️ ${alumno.nombre} tiene el pago vencido`);
+                    } else {
+                        toast.success(`✅ Ingreso registrado para ${alumno.nombre}`);
+                    }
+                } else {
+                    toast.info('Ingreso registrado (alumno no encontrado en la base)');
+                }
+            })
+            .catch(err => {
+                console.error(err);
+                toast.error('❌ Error al registrar ingreso');
+            });
     };
 
     const getSemaforoColor = (fechaVenc) => {
@@ -81,7 +88,7 @@ const IngresosPage = () => {
                                         title="Estado de pago"
                                     ></span>
                                     <span className="font-medium">{ingreso.nombre}</span>
-                                    <span className="text-sm text-gray-600">{ingreso.fecha}</span>
+                                    <span className="text-sm text-gray-600">{new Date(ingreso.fecha).toLocaleString()}</span>
                                 </li>
                             );
                         })}
