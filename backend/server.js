@@ -12,6 +12,8 @@ import dotenv from 'dotenv';
 import cors from 'cors'; // ✅ Nuevo
 import alumnosRouter from './src/routes/alumnos.router.js';
 import Alumno from './src/models/Alumno.js';
+import ingresosRouter from './src/routes/ingresos.router.js'
+
 
 dotenv.config();
 
@@ -60,6 +62,9 @@ app.get('/', (req, res) => {
 
 // Rutas API
 app.use('/api/alumnos', alumnosRouter);
+console.log('📦 ingresosRouter:', ingresosRouter);
+app.use('/api/ingresos', ingresosRouter);
+console.log('✅ Router de ingresos montado');
 
 // Vista paginada
 app.get('/alumnos', async (req, res) => {

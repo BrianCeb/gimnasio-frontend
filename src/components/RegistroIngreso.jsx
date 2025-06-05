@@ -2,9 +2,9 @@ import React from 'react';
 
 const RegistroIngreso = ({ onRegistrarIngreso }) => {
     const handleRegistro = () => {
-        const nombre = prompt("Nombre del alumno que ingresó:");
-        if (nombre) {
-            onRegistrarIngreso({ nombre, fecha: new Date().toLocaleString() });
+        const dni = prompt("DNI del alumno que ingresó:");
+        if (dni) {
+            onRegistrarIngreso({ dni });
         }
     };
 

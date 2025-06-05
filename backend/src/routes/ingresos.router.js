@@ -1,15 +1,25 @@
+// backend/src/routes/ingresos.router.js
 import express from 'express';
 import Ingreso from '../models/Ingreso.js';
+import Alumno from '../models/Alumno.js';
 
 const router = express.Router();
 
-// Crear nuevo ingreso
+// Crear nuevo ingreso por DNI
 router.post('/', async (req, res) => {
     try {
+        const { dni } = req.body;
+        const alumno = await Alumno.findOne({ dni });
+
+        if (!alumno) {
+            return res.status(404).json({ error: 'Alumno no encontrado' });
+        }
+
         const nuevo = new Ingreso({
-            nombre: req.body.nombre,
+            dni: req.body.dni,
             fecha: new Date()
         });
+
         await nuevo.save();
         res.status(201).json(nuevo);
     } catch (error) {

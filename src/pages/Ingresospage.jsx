@@ -6,6 +6,7 @@ import { toast } from 'react-toastify';
 const IngresosPage = () => {
     const [ingresos, setIngresos] = useState([]);
     const [alumnos, setAlumnos] = useState([]);
+    const [colapsados, setColapsados] = useState({});
 
     useEffect(() => {
         fetch('http://localhost:3000/api/ingresos')
@@ -20,6 +21,16 @@ const IngresosPage = () => {
     }, []);
 
     const handleRegistrarIngreso = (nuevoIngreso) => {
+        const yaIngresoHoy = ingresos.some(ingreso => {
+            const mismaFecha = new Date(ingreso.fecha).toDateString() === new Date().toDateString();
+            return ingreso.dni === nuevoIngreso.dni && mismaFecha;
+        });
+
+        if (yaIngresoHoy) {
+            toast.info('⚠️ Este alumno ya registró ingreso hoy');
+            return;
+        }
+
         fetch('http://localhost:3000/api/ingresos', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
@@ -28,7 +39,7 @@ const IngresosPage = () => {
             .then(res => res.json())
             .then((data) => {
                 setIngresos(prev => [data, ...prev]);
-                const alumno = alumnos.find(a => a.nombre.toLowerCase() === nuevoIngreso.nombre.toLowerCase());
+                const alumno = alumnos.find(a => a.dni === nuevoIngreso.dni);
 
                 if (alumno) {
                     const vencido = new Date(alumno.fechaVencimiento) < new Date();
@@ -54,45 +65,77 @@ const IngresosPage = () => {
         return 'bg-green-500';
     };
 
-    const buscarAlumno = (nombre) => {
-        return alumnos.find(a => a.nombre.toLowerCase() === nombre.toLowerCase());
+    const buscarAlumno = (dni) => {
+        return alumnos.find(a => a.dni === dni);
+    };
+
+    const ingresosAgrupados = ingresos.reduce((acc, ingreso) => {
+        const fecha = new Date(ingreso.fecha).toLocaleDateString();
+        if (!acc[fecha]) acc[fecha] = [];
+        acc[fecha].push(ingreso);
+        return acc;
+    }, {});
+
+    const toggleColapsado = (fecha) => {
+        setColapsados(prev => ({ ...prev, [fecha]: !prev[fecha] }));
     };
 
     return (
-        <div className="flex">
+        <div className="flex min-h-screen">
             <SidebarAdmin />
-            <main className="flex-1 p-6">
-                <h1 className="text-2xl font-bold mb-4">Registro de Ingresos</h1>
-                <RegistroIngreso onRegistrarIngreso={handleRegistrarIngreso} />
+            <main className="flex-1 p-6 flex flex-col items-center">
+                <div className="max-w-3xl w-full">
+                    <h1 className="text-3xl font-bold mb-6 text-center">Registro de Ingresos</h1>
+                    <p className="text-gray-600 text-center mb-8">
+                        Aquí podrás registrar y controlar el ingreso diario de los alumnos al gimnasio. Cada ingreso está agrupado por día y muestra el estado de pago de cada alumno.
+                    </p>
+                    <div className="flex justify-center mb-8">
+                        <RegistroIngreso onRegistrarIngreso={handleRegistrarIngreso} />
+                    </div>
 
-                <div className="mt-6">
-                    <h2 className="text-lg font-semibold mb-2">Historial de Ingresos</h2>
-                    <ul className="space-y-2">
-                        {ingresos.map((ingreso, index) => {
-                            const alumno = buscarAlumno(ingreso.nombre);
-                            const semaforo = alumno ? getSemaforoColor(alumno.fechaVencimiento) : 'bg-gray-300';
-                            const foto = alumno?.fotoUrl || 'https://via.placeholder.com/40';
+                    <div className="mt-10">
+                        <h2 className="text-xl font-semibold mb-4 text-center">Historial de Ingresos</h2>
 
-                            return (
-                                <li
-                                    key={index}
-                                    className="bg-gray-100 p-3 rounded shadow flex items-center space-x-4"
+                        {Object.entries(ingresosAgrupados).map(([fecha, listaIngresos]) => (
+                            <div key={fecha} className="mb-6">
+                                <button
+                                    className="w-full text-left font-semibold bg-gray-200 p-2 rounded hover:bg-gray-300"
+                                    onClick={() => toggleColapsado(fecha)}
                                 >
-                                    <img
-                                        src={foto}
-                                        alt="Foto"
-                                        className="w-10 h-10 rounded-full object-cover"
-                                    />
-                                    <span
-                                        className={`inline-block w-4 h-4 rounded-full ${semaforo}`}
-                                        title="Estado de pago"
-                                    ></span>
-                                    <span className="font-medium">{ingreso.nombre}</span>
-                                    <span className="text-sm text-gray-600">{new Date(ingreso.fecha).toLocaleString()}</span>
-                                </li>
-                            );
-                        })}
-                    </ul>
+                                    {fecha} ({listaIngresos.length} ingresos)
+                                </button>
+                                {!colapsados[fecha] && (
+                                    <ul className="space-y-2 mt-2">
+                                        {listaIngresos.map((ingreso, index) => {
+                                            const alumno = buscarAlumno(ingreso.dni);
+                                            const semaforo = alumno ? getSemaforoColor(alumno.fechaVencimiento) : 'bg-gray-300';
+                                            const foto = alumno?.fotoUrl || 'https://via.placeholder.com/40';
+                                            const nombre = alumno ? `${alumno.nombre} ${alumno.apellido}` : 'Alumno desconocido';
+
+                                            return (
+                                                <li
+                                                    key={index}
+                                                    className="bg-gray-100 p-3 rounded shadow flex items-center space-x-4"
+                                                >
+                                                    <img
+                                                        src={foto}
+                                                        alt="Foto"
+                                                        className="w-10 h-10 rounded-full object-cover"
+                                                    />
+                                                    <span
+                                                        className={`inline-block w-4 h-4 rounded-full ${semaforo}`}
+                                                        title="Estado de pago"
+                                                    ></span>
+                                                    <span className="font-medium">{nombre}</span>
+                                                    <span className="text-sm text-gray-600">{new Date(ingreso.fecha).toLocaleTimeString()}</span>
+                                                </li>
+                                            );
+                                        })}
+                                    </ul>
+                                )}
+                            </div>
+                        ))}
+                    </div>
                 </div>
             </main>
         </div>
