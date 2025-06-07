@@ -1,85 +1,80 @@
 import React, { useEffect, useState } from 'react';
 import SidebarAdmin from '../components/SlidebarAdmin';
-import axios from 'axios';
-import toast from 'react-hot-toast';
+import { toast } from 'react-toastify';
 
 const API_URL = import.meta.env.VITE_API_URL;
 
 const PagosPage = () => {
     const [alumnos, setAlumnos] = useState([]);
-    const [filtro, setFiltro] = useState('todos');
 
     useEffect(() => {
-        axios.get(`${API_URL}/api/alumnos`)
-            .then(res => setAlumnos(res.data))
-            .catch(err => console.error(err));
+        fetch(`${API_URL}/api/alumnos`)
+            .then(res => res.json())
+            .then(data => setAlumnos(data))
+            .catch(err => console.error('Error al obtener alumnos:', err));
     }, []);
 
-    const actualizarPago = async (id) => {
-        try {
-            const hoy = new Date();
-            await axios.put(`${API_URL}/api/alumnos/${id}`, {
-                fechaPago: hoy.toISOString()
+    const marcarPago = (id) => {
+        fetch(`${API_URL}/api/alumnos/${id}/pago`, { method: 'POST' })
+            .then(res => res.json())
+            .then(data => {
+                toast.success('✅ Pago marcado correctamente');
+                setAlumnos(prev => prev.map(a => (a._id === id ? data : a)));
+            })
+            .catch(err => {
+                console.error(err);
+                toast.error('❌ Error al marcar el pago');
             });
-            toast.success('Pago actualizado');
-            const res = await axios.get(`${API_URL}/api/alumnos`);
-            setAlumnos(res.data);
-        } catch (error) {
-            console.error(error);
-            toast.error('Error al actualizar pago');
-        }
     };
 
-    const obtenerEstado = (vencimiento) => {
-        const hoy = new Date();
-        const fechaVencimiento = new Date(vencimiento);
-        const diferencia = (fechaVencimiento - hoy) / (1000 * 60 * 60 * 24);
-        if (diferencia < 0) return 'vencido';
-        if (diferencia <= 5) return 'porVencer';
-        return 'alDia';
+    const getEstado = (fechaVenc) => {
+        const diff = (new Date(fechaVenc) - new Date()) / (1000 * 60 * 60 * 24);
+        if (diff <= 3 && diff >= 0) return { texto: 'Por vencer', color: 'bg-yellow-400' };
+        if (diff < 0) return { texto: 'Vencido', color: 'bg-red-500' };
+        return { texto: 'Al día', color: 'bg-green-500' };
     };
-
-    const filtrarAlumnos = alumnos.filter(alumno => {
-        const estado = obtenerEstado(alumno.fechaVencimiento);
-        return filtro === 'todos' || estado === filtro;
-    });
 
     return (
         <div className="flex min-h-screen">
             <SidebarAdmin />
-            <main className="flex-1 p-8">
-                <h2 className="text-2xl font-bold mb-4">Control de Pagos</h2>
-
-                <div className="mb-6 space-x-3">
-                    <button onClick={() => setFiltro('todos')} className="px-4 py-2 bg-gray-300 rounded">Todos</button>
-                    <button onClick={() => setFiltro('alDia')} className="px-4 py-2 bg-green-300 rounded">Al día</button>
-                    <button onClick={() => setFiltro('porVencer')} className="px-4 py-2 bg-yellow-300 rounded">Por vencer</button>
-                    <button onClick={() => setFiltro('vencido')} className="px-4 py-2 bg-red-300 rounded">Vencidos</button>
-                </div>
-
-                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                    {filtrarAlumnos.map(alumno => (
-                        <div key={alumno._id} className="bg-white p-4 shadow rounded">
-                            <h3 className="text-lg font-bold">{alumno.nombre} {alumno.apellido}</h3>
-                            <p className="text-sm">DNI: {alumno.dni}</p>
-                            <p className="text-sm">Pago: {new Date(alumno.fechaPago).toLocaleDateString()}</p>
-                            <p className="text-sm">Vence: {new Date(alumno.fechaVencimiento).toLocaleDateString()}</p>
-                            <div className="flex items-center mt-2">
-                                <span className={`inline-block w-3 h-3 rounded-full mr-2 ${obtenerEstado(alumno.fechaVencimiento) === 'alDia' ? 'bg-green-500' :
-                                        obtenerEstado(alumno.fechaVencimiento) === 'porVencer' ? 'bg-yellow-500' :
-                                            'bg-red-500'
-                                    }`} />
-                                <span className="text-sm">
-                                    {obtenerEstado(alumno.fechaVencimiento) === 'alDia' ? 'Al día' :
-                                        obtenerEstado(alumno.fechaVencimiento) === 'porVencer' ? 'Por vencer' :
-                                            'Vencido'}
-                                </span>
+            <main className="flex-1 p-6 bg-gray-50">
+                <h1 className="text-3xl font-bold mb-6 text-center">Control de Pagos</h1>
+                <p className="text-center text-gray-600 mb-8">
+                    Aquí puedes ver el estado de los pagos de los alumnos y marcar pagos actualizados.
+                </p>
+                <div className="max-w-5xl mx-auto grid gap-4 md:grid-cols-2 lg:grid-cols-3">
+                    {alumnos.map(alumno => {
+                        const estado = getEstado(alumno.fechaVencimiento);
+                        return (
+                            <div
+                                key={alumno._id}
+                                className="bg-white rounded-xl shadow-md p-4 flex flex-col justify-between transition hover:shadow-lg"
+                            >
+                                <div className="flex items-center space-x-4">
+                                    <img
+                                        src={alumno.fotoUrl || 'https://via.placeholder.com/40'}
+                                        alt="foto"
+                                        className="w-12 h-12 rounded-full object-cover"
+                                    />
+                                    <div>
+                                        <h3 className="text-lg font-semibold text-gray-800">{alumno.nombre} {alumno.apellido}</h3>
+                                        <p className="text-sm text-gray-500">DNI: {alumno.dni}</p>
+                                    </div>
+                                </div>
+                                <div className="mt-4 flex justify-between items-center">
+                                    <span className={`px-3 py-1 rounded-full text-xs font-medium text-white ${estado.color}`}>
+                                        {estado.texto}
+                                    </span>
+                                    <button
+                                        onClick={() => marcarPago(alumno._id)}
+                                        className="bg-green-600 hover:bg-green-700 text-white px-4 py-1 rounded transition"
+                                    >
+                                        Marcar Pago
+                                    </button>
+                                </div>
                             </div>
-                            <button onClick={() => actualizarPago(alumno._id)} className="mt-4 px-4 py-2 bg-blue-500 text-white rounded">
-                                Registrar Pago
-                            </button>
-                        </div>
-                    ))}
+                        );
+                    })}
                 </div>
             </main>
         </div>
