@@ -35,11 +35,11 @@ const PagosPage = () => {
     };
 
     return (
-        <div className="flex min-h-screen">
+        <div className="flex min-h-screen bg-neutral-900 text-white">
             <SidebarAdmin />
-            <main className="flex-1 p-6 bg-gray-50">
+            <main className="flex-1 p-6">
                 <h1 className="text-3xl font-bold mb-6 text-center">Control de Pagos</h1>
-                <p className="text-center text-gray-600 mb-8">
+                <p className="text-center text-neutral-300 mb-8">
                     Aquí puedes ver el estado de los pagos de los alumnos y marcar pagos actualizados.
                 </p>
                 <div className="max-w-5xl mx-auto grid gap-4 md:grid-cols-2 lg:grid-cols-3">
@@ -48,17 +48,17 @@ const PagosPage = () => {
                         return (
                             <div
                                 key={alumno._id}
-                                className="bg-white rounded-xl shadow-md p-4 flex flex-col justify-between transition hover:shadow-lg"
+                                className="bg-neutral-800 rounded-xl shadow-md p-4 flex flex-col justify-between transition hover:shadow-xl hover:scale-105 duration-300"
                             >
                                 <div className="flex items-center space-x-4">
                                     <img
                                         src={alumno.fotoUrl || 'https://via.placeholder.com/40'}
                                         alt="foto"
-                                        className="w-12 h-12 rounded-full object-cover"
+                                        className="w-12 h-12 rounded-full object-cover border-2 border-white"
                                     />
                                     <div>
-                                        <h3 className="text-lg font-semibold text-gray-800">{alumno.nombre} {alumno.apellido}</h3>
-                                        <p className="text-sm text-gray-500">DNI: {alumno.dni}</p>
+                                        <h3 className="text-lg font-semibold text-white">{alumno.nombre} {alumno.apellido}</h3>
+                                        <p className="text-sm text-neutral-400">DNI: {alumno.dni}</p>
                                     </div>
                                 </div>
                                 <div className="mt-4 flex justify-between items-center">
@@ -67,7 +67,7 @@ const PagosPage = () => {
                                     </span>
                                     <button
                                         onClick={() => marcarPago(alumno._id)}
-                                        className="bg-green-600 hover:bg-green-700 text-white px-4 py-1 rounded transition"
+                                        className="bg-orange-500 hover:bg-orange-600 text-white px-4 py-1 rounded transition"
                                     >
                                         Marcar Pago
                                     </button>
