@@ -45,30 +45,30 @@ const RealTimePage = () => {
         return Object.entries(map).map(([fecha, cantidad]) => ({ fecha, cantidad }));
     };
 
-    const colores = ['#22c55e', '#facc15', '#ef4444'];
+    const colores = ['#16a34a', '#ca8a04', '#dc2626'];
 
     return (
-        <div className="flex min-h-screen">
+        <div className="flex min-h-screen bg-neutral-50">
             <SidebarAdmin />
             <main className="flex-1 p-8">
-                <h2 className="text-2xl font-bold mb-6">Estadísticas en Tiempo Real</h2>
+                <h2 className="text-3xl font-bold text-neutral-800 mb-8">Estadísticas en Tiempo Real</h2>
 
-                <div className="grid grid-cols-1 lg:grid-cols-2 gap-12">
-                    <div className="bg-white p-6 rounded shadow">
-                        <h3 className="text-xl font-semibold mb-4">Ingresos por Día (últimos días)</h3>
+                <div className="grid grid-cols-1 lg:grid-cols-2 gap-10">
+                    <div className="bg-white border border-neutral-200 p-6 rounded-2xl shadow-md">
+                        <h3 className="text-xl font-semibold text-neutral-700 mb-4">Ingresos por Día (recientes)</h3>
                         <ResponsiveContainer width="100%" height={300}>
                             <LineChart data={ingresosPorDia}>
                                 <CartesianGrid strokeDasharray="3 3" />
                                 <XAxis dataKey="fecha" />
                                 <YAxis />
                                 <Tooltip />
-                                <Line type="monotone" dataKey="cantidad" stroke="#3b82f6" strokeWidth={3} />
+                                <Line type="monotone" dataKey="cantidad" stroke="#2563eb" strokeWidth={3} />
                             </LineChart>
                         </ResponsiveContainer>
                     </div>
 
-                    <div className="bg-white p-6 rounded shadow">
-                        <h3 className="text-xl font-semibold mb-4">Estado de Pagos</h3>
+                    <div className="bg-white border border-neutral-200 p-6 rounded-2xl shadow-md">
+                        <h3 className="text-xl font-semibold text-neutral-700 mb-4">Estado de Pagos</h3>
                         <ResponsiveContainer width="100%" height={300}>
                             <PieChart>
                                 <Pie

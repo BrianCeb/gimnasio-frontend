@@ -9,10 +9,10 @@ const RegistroIngreso = ({ onRegistrarIngreso }) => {
     };
 
     return (
-        <div className="mt-4">
+        <div className="mt-6">
             <button
                 onClick={handleRegistro}
-                className="bg-green-600 text-white px-4 py-2 rounded"
+                className="px-5 py-2 bg-neutral-800 text-white rounded-md text-sm hover:bg-neutral-900 transition-all shadow-md hover:shadow-lg"
             >
                 Registrar Ingreso
             </button>

@@ -5,7 +5,7 @@ import { Link } from 'react-router-dom';
 const InicioPage = () => {
     return (
         <div className="flex min-h-screen bg-neutral-50 text-neutral-800">
-            <SidebarAdmin />
+            {/* <SidebarAdmin /> */}
             <main className="flex-1 flex flex-col items-center justify-center text-center p-10">
                 <div className="max-w-3xl w-full">
                     <h1 className="text-4xl md:text-5xl font-extrabold mb-6 text-neutral-900 transition-all duration-500">

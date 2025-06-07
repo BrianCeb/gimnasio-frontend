@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 
 const AlumnoForm = ({ onSubmit, editingAlumno }) => {
-    const [alumno, setAlumno] = useState({
+    const [formData, setFormData] = useState({
         nombre: '',
         apellido: '',
         dni: '',
@@ -12,9 +12,22 @@ const AlumnoForm = ({ onSubmit, editingAlumno }) => {
 
     useEffect(() => {
         if (editingAlumno) {
-            setAlumno(editingAlumno);
-        } else {
-            setAlumno({
+            setFormData(editingAlumno);
+        }
+    }, [editingAlumno]);
+
+    const handleChange = (e) => {
+        setFormData({
+            ...formData,
+            [e.target.name]: e.target.value
+        });
+    };
+
+    const handleSubmit = (e) => {
+        e.preventDefault();
+        onSubmit(formData);
+        if (!editingAlumno) {
+            setFormData({
                 nombre: '',
                 apellido: '',
                 dni: '',
@@ -23,112 +36,70 @@ const AlumnoForm = ({ onSubmit, editingAlumno }) => {
                 fotoUrl: ''
             });
         }
-    }, [editingAlumno]);
-
-    const handleChange = (e) => {
-        setAlumno({ ...alumno, [e.target.name]: e.target.value });
     };
 
-    const handleSubmit = (e) => {
-    e.preventDefault();
-    onSubmit(alumno);
-
-    // Limpiar formulario si fue edición o alta
-    setAlumno({
-        nombre: '',
-        apellido: '',
-        dni: '',
-        email: '',
-        fechaPago: '',
-        fotoUrl: ''
-    });
-};
-
-
     return (
-        <form onSubmit={handleSubmit} className="bg-white p-4 rounded shadow-md mt-4">
-            <h2 className="text-lg font-semibold mb-4">
-                {editingAlumno ? 'Editar Alumno' : 'Alta de Alumno'}
-            </h2>
-
-            <div className="mb-2">
-                <label className="block mb-1">Nombre:</label>
+        <form onSubmit={handleSubmit} className="bg-white p-6 rounded-2xl shadow-md border border-neutral-200 max-w-xl mx-auto mt-6 w-full animate-fade-in">
+            <h2 className="text-2xl font-bold text-neutral-800 mb-4">{editingAlumno ? 'Editar Alumno' : 'Agregar Alumno'}</h2>
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <input
                     type="text"
                     name="nombre"
-                    value={alumno.nombre}
+                    placeholder="Nombre"
+                    value={formData.nombre}
                     onChange={handleChange}
-                    className="w-full border p-2 rounded"
                     required
+                    className="input"
                 />
-            </div>
-
-            <div className="mb-2">
-                <label className="block mb-1">Apellido:</label>
                 <input
                     type="text"
                     name="apellido"
-                    value={alumno.apellido}
+                    placeholder="Apellido"
+                    value={formData.apellido}
                     onChange={handleChange}
-                    className="w-full border p-2 rounded"
                     required
+                    className="input"
                 />
-            </div>
-
-            <div className="mb-2">
-                <label className="block mb-1">DNI:</label>
                 <input
                     type="text"
                     name="dni"
-                    value={alumno.dni}
+                    placeholder="DNI"
+                    value={formData.dni}
                     onChange={handleChange}
-                    className="w-full border p-2 rounded"
                     required
-                    disabled={editingAlumno}
+                    className="input"
                 />
-            </div>
-
-            <div className="mb-2">
-                <label className="block mb-1">Email:</label>
                 <input
                     type="email"
                     name="email"
-                    value={alumno.email}
+                    placeholder="Email"
+                    value={formData.email}
                     onChange={handleChange}
-                    className="w-full border p-2 rounded"
                     required
+                    className="input"
                 />
-            </div>
-
-            <div className="mb-2">
-                <label className="block mb-1">Fecha de Pago:</label>
                 <input
                     type="date"
                     name="fechaPago"
-                    value={alumno.fechaPago}
+                    value={formData.fechaPago}
                     onChange={handleChange}
-                    className="w-full border p-2 rounded"
                     required
+                    className="input"
                 />
-            </div>
-
-            <div className="mb-2">
-                <label className="block mb-1">Foto (URL):</label>
                 <input
-                    type="url"
+                    type="text"
                     name="fotoUrl"
-                    value={alumno.fotoUrl}
+                    placeholder="URL de la foto"
+                    value={formData.fotoUrl}
                     onChange={handleChange}
-                    className="w-full border p-2 rounded"
-                    placeholder="https://..."
+                    className="input"
                 />
             </div>
-
             <button
                 type="submit"
-                className="bg-green-600 text-white px-4 py-2 rounded mt-2"
+                className="mt-6 w-full bg-neutral-800 text-white py-3 rounded-md text-lg hover:bg-neutral-900 transition"
             >
-                {editingAlumno ? 'Actualizar' : 'Guardar'}
+                {editingAlumno ? 'Guardar Cambios' : 'Agregar Alumno'}
             </button>
         </form>
     );

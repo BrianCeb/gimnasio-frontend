@@ -9,27 +9,26 @@ const AlumnosList = ({ alumnos, onEdit, onDelete }) => {
     };
 
     return (
-        <div className="mt-4">
-            <h2 className="text-lg font-semibold mb-2">Listado de Alumnos</h2>
-            <ul className="space-y-2">
+        <div className="mt-6">
+            <h2 className="text-2xl font-semibold text-neutral-800 mb-4">Listado de Alumnos</h2>
+            <ul className="space-y-4">
                 {alumnos.map((alumno, index) => {
                     const fechaVenc = new Date(alumno.fechaVencimiento).toLocaleDateString();
 
                     return (
                         <li
                             key={index}
-                            className="bg-gray-100 p-3 rounded shadow flex justify-between items-center transition-all duration-300 animate-fade-in"
+                            className="bg-white border border-neutral-200 rounded-2xl shadow-sm p-4 flex justify-between items-center hover:shadow-md transition-all duration-300"
                         >
-
-                            <div className="flex items-center space-x-3">
+                            <div className="flex items-center space-x-4">
                                 <img
-                                    src={alumno.fotoUrl || 'https://via.placeholder.com/48'}
+                                    src={alumno.fotoUrl || 'https://randomuser.me/api/portraits/men/1.jpg'}
                                     alt="Foto"
-                                    className="w-12 h-12 rounded-full object-cover"
+                                    className="w-12 h-12 rounded-full object-cover border border-neutral-300"
                                 />
                                 <div>
-                                    <p className="font-medium">{alumno.nombre} {alumno.apellido}</p>
-                                    <p className="text-sm text-gray-600">Vence: {fechaVenc}</p>
+                                    <p className="text-lg font-medium text-neutral-900">{alumno.nombre} {alumno.apellido}</p>
+                                    <p className="text-sm text-neutral-500">Vence: {fechaVenc}</p>
                                 </div>
                             </div>
                             <div className="flex items-center space-x-3">
@@ -39,13 +38,13 @@ const AlumnosList = ({ alumnos, onEdit, onDelete }) => {
                                 ></span>
                                 <button
                                     onClick={() => onEdit(alumno)}
-                                    className="bg-yellow-400 text-white px-2 py-1 rounded"
+                                    className="px-3 py-1 bg-neutral-800 text-white rounded-md text-sm hover:bg-neutral-900 transition"
                                 >
                                     Editar
                                 </button>
                                 <button
                                     onClick={() => onDelete(alumno)}
-                                    className="bg-red-500 text-white px-2 py-1 rounded"
+                                    className="px-3 py-1 bg-neutral-500 text-white rounded-md text-sm hover:bg-neutral-600 transition"
                                 >
                                     Eliminar
                                 </button>
