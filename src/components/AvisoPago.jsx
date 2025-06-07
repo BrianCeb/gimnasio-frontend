@@ -19,21 +19,21 @@ const AvisoPago = ({ alumnos }) => {
     if (alumnosConAviso.length === 0) return null;
 
     return (
-        <div className="bg-yellow-100 p-4 rounded shadow-md mt-4">
-            <h2 className="text-lg font-semibold mb-2 text-yellow-800">Pagos Próximos a Vencer</h2>
-            <ul className="space-y-2">
+        <div className="bg-white border border-yellow-200 rounded-xl shadow-sm p-5 mb-6">
+            <h2 className="text-xl font-semibold text-yellow-600 mb-4">⏳ Pagos Próximos a Vencer</h2>
+            <ul className="space-y-3">
                 {alumnosConAviso.map((alumno, index) => {
                     const fechaVenc = new Date(alumno.fechaVencimiento).toLocaleDateString();
                     const diasRestantes = Math.ceil((new Date(alumno.fechaVencimiento) - hoy) / (1000 * 60 * 60 * 24));
 
                     return (
-                        <li key={index} className="flex items-center space-x-3">
+                        <li key={index} className="flex items-center space-x-4">
                             <span
-                                className={`inline-block w-3 h-3 rounded-full ${getSemaforoColor(alumno.fechaVencimiento)}`}
+                                className={`inline-block w-3.5 h-3.5 rounded-full ${getSemaforoColor(alumno.fechaVencimiento)}`}
                                 title="Estado de pago"
                             ></span>
-                            <span>
-                                <span className="font-medium">{alumno.nombre} {alumno.apellido}</span> - vence el {fechaVenc} ({diasRestantes} día/s)
+                            <span className="text-neutral-700">
+                                <span className="font-medium">{alumno.nombre} {alumno.apellido}</span> — vence el <strong>{fechaVenc}</strong> ({diasRestantes} día/s)
                             </span>
                         </li>
                     );
