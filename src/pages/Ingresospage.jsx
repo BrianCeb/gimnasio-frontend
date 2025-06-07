@@ -1,5 +1,4 @@
-// PRIMER ARCHIVO A MODIFICAR:
-// src/pages/Ingresospage.jsx
+
 
 import React, { useState, useEffect } from 'react';
 import SidebarAdmin from '../components/SlidebarAdmin';
