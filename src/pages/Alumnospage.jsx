@@ -6,7 +6,10 @@ import AlumnosList from '../components/AlumnoList';
 import AvisoPago from '../components/AvisoPago';
 import { toast } from 'react-toastify';
 
-const socket = io('http://localhost:3000');
+const API_URL = import.meta.env.VITE_API_URL;
+const socket = io(API_URL);
+
+
 
 const AlumnosPage = () => {
     const [alumnos, setAlumnos] = useState([]);
@@ -14,7 +17,7 @@ const AlumnosPage = () => {
     const [mostrarFormulario, setMostrarFormulario] = useState(false);
 
     useEffect(() => {
-        fetch('http://localhost:3000/api/alumnos')
+        fetch(`${API_URL}/api/alumnos`)
             .then(res => res.json())
             .then(data => setAlumnos(data))
             .catch(err => console.error('Error al obtener alumnos:', err));
@@ -30,7 +33,7 @@ const AlumnosPage = () => {
 
     const handleAgregarAlumno = (alumno) => {
     if (editingAlumno) {
-        fetch(`http://localhost:3000/api/alumnos/${editingAlumno._id}`, {
+        fetch(`${API_URL}/api/alumnos/${editingAlumno._id}`, {
             method: 'PUT',
             headers: {
                 'Content-Type': 'application/json'
@@ -46,7 +49,7 @@ const AlumnosPage = () => {
                 setEditingAlumno(null);
                 setMostrarFormulario(false);
                 // Refrescar la lista completa
-                fetch('http://localhost:3000/api/alumnos')
+                fetch(`${API_URL}/api/alumnos`)
                     .then(res => res.json())
                     .then(data => setAlumnos(data));
             })

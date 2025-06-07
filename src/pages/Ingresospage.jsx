@@ -2,6 +2,8 @@ import React, { useState, useEffect } from 'react';
 import SidebarAdmin from '../components/SlidebarAdmin';
 import RegistroIngreso from '../components/RegistroIngreso';
 import { toast } from 'react-toastify';
+const API_URL = import.meta.env.VITE_API_URL;
+
 
 const IngresosPage = () => {
     const [ingresos, setIngresos] = useState([]);
@@ -9,12 +11,12 @@ const IngresosPage = () => {
     const [colapsados, setColapsados] = useState({});
 
     useEffect(() => {
-        fetch('http://localhost:3000/api/ingresos')
+        fetch(`${API_URL}/api/ingresos`)
             .then(res => res.json())
             .then(data => setIngresos(data))
             .catch(err => console.error('Error al obtener ingresos:', err));
 
-        fetch('http://localhost:3000/api/alumnos')
+        fetch(`${API_URL}/api/alumnos`)
             .then(res => res.json())
             .then(data => setAlumnos(data))
             .catch(err => console.error('Error al obtener alumnos:', err));
@@ -31,7 +33,7 @@ const IngresosPage = () => {
             return;
         }
 
-        fetch('http://localhost:3000/api/ingresos', {
+        fetch(`${API_URL}/api/ingresos`, {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify(nuevoIngreso)
