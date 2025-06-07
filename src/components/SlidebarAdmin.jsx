@@ -9,7 +9,7 @@ const SidebarAdmin = () => {
         <>
             
             <button
-                className="md:hidden fixed top-4 left-4 z-50 bg-white rounded-full shadow-md p-2"
+                className="md:hidden fixed top-4 right-4 z-50 bg-white rounded-full shadow-md p-2"
                 onClick={() => setOpen(true)}
             >
                 <Menu size={24} className="text-green-700" />
