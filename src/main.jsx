@@ -14,7 +14,7 @@ import 'react-toastify/dist/ReactToastify.css';
 ReactDOM.createRoot(document.getElementById('root')).render(
     <React.StrictMode>
         <BrowserRouter>
-            <NavBar />
+            {/* <NavBar /> */}
             <Routes>
                 <Route path="/" element={<InicioPage />} />
                 <Route path="/alumnos" element={<AlumnosPage />} />
